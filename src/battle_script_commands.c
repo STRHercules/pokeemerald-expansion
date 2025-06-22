@@ -16028,11 +16028,10 @@ static void Cmd_givecaughtmon(void)
     switch (state)
     {
     case GIVECAUGHTMON_CHECK_PARTY_SIZE:
-        if (CalculatePlayerPartyCount() == PARTY_SIZE && B_CATCH_SWAP_INTO_PARTY >= GEN_7)
+        if (CalculatePlayerPartyCount() == PARTY_SIZE)
         {
-            PrepareStringBattle(STRINGID_SENDCAUGHTMONPARTYORBOX, gBattlerAttacker);
-            gBattleCommunication[MSG_DISPLAY] = 1;
-            gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_ASK_ADD_TO_PARTY;
+            gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_PARTY_FULL;
+            gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
         }
         else
         {
@@ -16100,21 +16099,9 @@ static void Cmd_givecaughtmon(void)
             else
             {
                 // Mon chosen, try to put it in the PC
-                if (CopyMonToPC(&gPlayerParty[gSelectedMonPartyId]) == MON_GIVEN_TO_PC)
-                {
-                    GetMonNickname(&gPlayerParty[gSelectedMonPartyId], gStringVar2);
-                    StringCopy(gStringVar1, GetBoxNamePtr(GetPCBoxToSendMon()));
-                    ZeroMonData(&gPlayerParty[gSelectedMonPartyId]);
-                    gBattleStruct->itemLost[B_SIDE_PLAYER][gSelectedMonPartyId].originalItem = ITEM_NONE;
-                    gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SWAPPED_INTO_PARTY;
-                    gSelectedMonPartyId = PARTY_SIZE;
-                    gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
-                }
-                else
-                {
-                    gSelectedMonPartyId = PARTY_SIZE;
-                    gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
-                }
+                gSelectedMonPartyId = PARTY_SIZE;
+                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_PARTY_FULL;
+                gBattleCommunication[MULTIUSE_STATE] = GIVECAUGHTMON_GIVE_AND_SHOW_MSG;
             }
         }
         break;
@@ -16126,26 +16113,35 @@ static void Cmd_givecaughtmon(void)
                 SetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_HELD_ITEM, &lostItem);  // Restore non-berry items
         }
 
-        if (GiveMonToPlayer(GetBattlerMon(GetCatchingBattler())) != MON_GIVEN_TO_PARTY
-         && gBattleCommunication[MULTISTRING_CHOOSER] != B_MSG_SWAPPED_INTO_PARTY)
         {
-            if (!ShouldShowBoxWasFullMessage())
+            u8 res = GiveMonToPlayer(GetBattlerMon(GetCatchingBattler()));
+            if (res != MON_GIVEN_TO_PARTY && gBattleCommunication[MULTISTRING_CHOOSER] != B_MSG_SWAPPED_INTO_PARTY)
             {
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SENT_SOMEONES_PC;
-                StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON)));
-                GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_NICKNAME, gStringVar2);
-            }
-            else
-            {
-                StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON))); // box the mon was sent to
-                GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_NICKNAME, gStringVar2);
-                StringCopy(gStringVar3, GetBoxNamePtr(GetPCBoxToSendMon())); //box the mon was going to be sent to
-                gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SOMEONES_BOX_FULL;
-            }
+                if (res == MON_CANT_GIVE)
+                {
+                    gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_PARTY_FULL;
+                }
+                else
+                {
+                    if (!ShouldShowBoxWasFullMessage())
+                    {
+                        gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SENT_SOMEONES_PC;
+                        StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON)));
+                        GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_NICKNAME, gStringVar2);
+                    }
+                    else
+                    {
+                        StringCopy(gStringVar1, GetBoxNamePtr(VarGet(VAR_PC_BOX_TO_SEND_MON))); // box the mon was sent to
+                        GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_NICKNAME, gStringVar2);
+                        StringCopy(gStringVar3, GetBoxNamePtr(GetPCBoxToSendMon())); //box the mon was going to be sent to
+                        gBattleCommunication[MULTISTRING_CHOOSER] = B_MSG_SOMEONES_BOX_FULL;
+                    }
 
-            // Change to B_MSG_SENT_LANETTES_PC or B_MSG_LANETTES_BOX_FULL
-            if (FlagGet(FLAG_SYS_PC_LANETTE))
-                gBattleCommunication[MULTISTRING_CHOOSER]++;
+                    // Change to B_MSG_SENT_LANETTES_PC or B_MSG_LANETTES_BOX_FULL
+                    if (FlagGet(FLAG_SYS_PC_LANETTE))
+                        gBattleCommunication[MULTISTRING_CHOOSER]++;
+                }
+            }
         }
 
         gBattleResults.caughtMonSpecies = GetMonData(GetBattlerMon(GetCatchingBattler()), MON_DATA_SPECIES, NULL);

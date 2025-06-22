@@ -6245,7 +6245,7 @@ static void RestoreFusionMon(struct Pokemon *mon)
 
     if (i >= PARTY_SIZE)
     {
-        CopyMonToPC(mon);
+        return;
     }
     else
     {

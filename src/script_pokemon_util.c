@@ -448,7 +448,7 @@ static u32 ScriptGiveMonParameterized(u8 side, u8 slot, u16 species, u8 level, u
         }
         if (i >= PARTY_SIZE)
         {
-            sentToPc = CopyMonToPC(&mon);
+            sentToPc = MON_CANT_GIVE;
         }
         else
         {

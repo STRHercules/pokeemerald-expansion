@@ -715,45 +715,32 @@ static void CreatePCMultichoice(void)
     u8 width;
     u8 numChoices;
     u8 windowId;
-    int i;
 
-    for (i = 0; i < ARRAY_COUNT(sPCNameStrings); i++)
-    {
-        pixelWidth = DisplayTextAndGetWidth(sPCNameStrings[i], pixelWidth);
-    }
-
+    pixelWidth = DisplayTextAndGetWidth(gText_PlayersPC, pixelWidth);
     if (FlagGet(FLAG_SYS_GAME_CLEAR))
-    {
         pixelWidth = DisplayTextAndGetWidth(gText_HallOfFame, pixelWidth);
-    }
+    pixelWidth = DisplayTextAndGetWidth(gText_LogOff, pixelWidth);
 
     width = ConvertPixelWidthToTileWidth(pixelWidth);
 
-    // Include Hall of Fame option if player is champion
     if (FlagGet(FLAG_SYS_GAME_CLEAR))
-    {
-        numChoices = 4;
-        windowId = CreateWindowFromRect(0, 0, width, 8);
-        SetStandardWindowBorderStyle(windowId, FALSE);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_HallOfFame, x, 33, TEXT_SKIP_DRAW, NULL);
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 49, TEXT_SKIP_DRAW, NULL);
-    }
-    else
     {
         numChoices = 3;
         windowId = CreateWindowFromRect(0, 0, width, 6);
         SetStandardWindowBorderStyle(windowId, FALSE);
+        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_HallOfFame, x, 17, TEXT_SKIP_DRAW, NULL);
         AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 33, TEXT_SKIP_DRAW, NULL);
     }
-
-    // Change PC name if player has met Lanette
-    if (FlagGet(FLAG_SYS_PC_LANETTE))
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LanettesPC, x, 1, TEXT_SKIP_DRAW, NULL);
     else
-        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_SomeonesPC, x, 1, TEXT_SKIP_DRAW, NULL);
+    {
+        numChoices = 2;
+        windowId = CreateWindowFromRect(0, 0, width, 4);
+        SetStandardWindowBorderStyle(windowId, FALSE);
+        AddTextPrinterParameterized(windowId, FONT_NORMAL, gText_LogOff, x, 17, TEXT_SKIP_DRAW, NULL);
+    }
 
     StringExpandPlaceholders(gStringVar4, gText_PlayersPC);
-    PrintPlayerNameOnWindow(windowId, gStringVar4, x, 17);
+    PrintPlayerNameOnWindow(windowId, gStringVar4, x, 1);
     InitMenuInUpperLeftCornerNormal(windowId, numChoices, 0);
     CopyWindowToVram(windowId, COPYWIN_FULL);
     InitMultichoiceCheckWrap(FALSE, numChoices, windowId, MULTI_PC);

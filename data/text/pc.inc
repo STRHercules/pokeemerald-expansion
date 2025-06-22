@@ -14,4 +14,7 @@ gText_AccessedPlayersPC::
 	.string "Accessed {PLAYER}'s PC.$"
 
 gText_AccessedLanettesPC::
-	.string "Accessed LANETTE's PC.$"
+        .string "Accessed LANETTE's PC.$"
+
+gText_BoxLinkDisabled::
+        .string "But nothing happened.$"

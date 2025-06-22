@@ -778,6 +778,7 @@ extern const u8 gText_LanettesPC[];
 extern const u8 gText_SomeonesPC[];
 extern const u8 gText_PlayersPC[];
 extern const u8 gText_WhichPCShouldBeAccessed[];
+extern const u8 gText_BoxLinkDisabled[];
 
 extern const u8 gText_Info2[];
 extern const u8 gText_Decoration2[];

@@ -3764,7 +3764,7 @@ static void DebugAction_Give_Pokemon_ComplexCreateMon(u8 taskId) //https://githu
 
     if (i >= PARTY_SIZE)
     {
-        sentToPc = CopyMonToPC(&mon);
+        sentToPc = MON_CANT_GIVE;
     }
     else
     {
